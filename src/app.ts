@@ -17,10 +17,22 @@ function splitWordInCharacters() {
   }
 }
 
-function findCharsInArray() {
-  for (let i = 0; i < word.length; i += 1) {
-    console.log(word.charAt(i));
+/**
+ * Function that finds the index of characters in array
+ *
+ * @param target
+ * @returns indexLocation
+ */
+function findCharsInArray(target: HTMLElement) {
+  const indexLocation: number[] = [];
+  for (let i = 0; i < charactersInWord.length; i += 1) {
+    if (target.id === charactersInWord[i]) {
+      console.log(charactersInWord[i]);
+      indexLocation.push(i);
+    }
   }
+  // console.log(indexLocation);
+  return indexLocation;
 }
 
 /**
@@ -63,6 +75,7 @@ function guessLetter(e: Event) {
   // the letter where the user clicked on
   const letter: string = target.id;
   console.log(letter);
+  findCharsInArray(target);
 }
 
 /**
@@ -104,7 +117,6 @@ function init() {
   splitWordInCharacters();
   writeAttemptToTheDOM();
   writeGuessedWordToTheDOM();
-  findCharsInArray();
 }
 
 window.addEventListener('load', init);
