@@ -12,10 +12,15 @@ function splitWordInCharacters() {
         guessedCharactersInWord.push('-');
     }
 }
-function findCharsInArray() {
-    for (let i = 0; i < word.length; i += 1) {
-        console.log(word.charAt(i));
+function findCharsInArray(target) {
+    const indexLocation = [];
+    for (let i = 0; i < charactersInWord.length; i += 1) {
+        if (target.id === charactersInWord[i]) {
+            console.log(charactersInWord[i]);
+            indexLocation.push(i);
+        }
     }
+    return indexLocation;
 }
 function setWord(newWord) {
     word = newWord;
@@ -36,6 +41,7 @@ function guessLetter(e) {
     const target = e.target;
     const letter = target.id;
     console.log(letter);
+    findCharsInArray(target);
 }
 function writeAlphabetToTheDom() {
     const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
@@ -59,7 +65,6 @@ function init() {
     splitWordInCharacters();
     writeAttemptToTheDOM();
     writeGuessedWordToTheDOM();
-    findCharsInArray();
 }
 window.addEventListener('load', init);
 //# sourceMappingURL=app.js.map
