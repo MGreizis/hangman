@@ -1,102 +1,110 @@
-const randomWords = ['random', 'school', 'hippopotamus', 'water', 'hangman', 'teacher', 'cryptocurrency', 'bitcoin', 'AlbertHeijn'];
-let word;
-let charactersInWord;
-const guessedcharactersInWord = [];
-const lettersInDOM = document.querySelector('#letters');
-const attemptInDOM = document.querySelector('#attempt');
-let attempts = 5;
-function splitWordInCharacters() {
-    charactersInWord = word.split('');
-    for (let i = 0; i < word.length; i += 1) {
-        guessedcharactersInWord.push('-');
+class Hangman {
+    randomWords;
+    word;
+    charactersInWord;
+    guessedCharactersInWord;
+    lettersInDOM;
+    attemptInDOM;
+    attempts;
+    constructor() {
+        this.randomWords = ['random', 'school', 'hippopotamus', 'water', 'hangman', 'teacher', 'cryptocurrency', 'bitcoin', 'AlbertHeijn'];
+        this.guessedCharactersInWord = [];
+        this.lettersInDOM = document.querySelector('#letters');
+        this.attemptInDOM = document.querySelector('#attempt');
+        this.attempts = 5;
+        this.writeAlphabetToTheDom();
+        this.setWord(this.randomWords[this.randomNumber(0, this.randomWords.length - 1)]);
+        console.log(this.word);
+        this.splitWordInCharacters();
+        console.log(this.word);
+        console.log(this.guessedCharactersInWord);
+        this.writeAttemptToTheDOM();
+        this.writeGuessedWordToTheDOM();
     }
-}
-function addLetterToGuessedWord(indexArray, letter) {
-    indexArray.forEach((charIndex) => {
-        guessedcharactersInWord[charIndex] = letter;
-    });
-}
-function writeAttemptToTheDOM() {
-    attemptInDOM.innerHTML = String(attempts);
-}
-function findLetters(clickedLetter) {
-    const indexOfLetters = [];
-    charactersInWord.forEach((letterInArray, index) => {
-        if (clickedLetter === letterInArray) {
-            indexOfLetters.push(index);
+    splitWordInCharacters() {
+        this.charactersInWord = this.word.split('');
+        for (let i = 0; i < this.word.length; i += 1) {
+            this.guessedCharactersInWord.push('-');
         }
-    });
-    return indexOfLetters;
-}
-function setWord(newWord) {
-    word = newWord;
-}
-function checkWinner() {
-    console.log(`${word} is ${guessedcharactersInWord.join('')}`);
-    if (word === guessedcharactersInWord.join('')) {
-        lettersInDOM.classList.add('winner');
     }
-    else if (attempts === 0) {
-        lettersInDOM.classList.add('lost');
-        const keys = document.querySelectorAll('.key');
-        keys.forEach((key) => {
-            key.classList.add('idle');
+    findLetters(clickedLetter) {
+        const indexOfLetters = [];
+        this.charactersInWord.forEach((letterInArray, index) => {
+            if (clickedLetter === letterInArray) {
+                indexOfLetters.push(index);
+            }
+        });
+        return indexOfLetters;
+    }
+    guessLetter = (e) => {
+        const target = e.target;
+        if (target.className === 'key') {
+            console.log(target.id);
+            const indexes = this.findLetters(target.id);
+            console.log('indexes', indexes);
+            if (indexes.length !== 0) {
+                console.log('found');
+                this.addLetterToGuessedWord(indexes, target.id);
+                document.getElementById(target.id).classList.add('idle');
+            }
+            else {
+                console.log('not found');
+                this.attempts -= 1;
+                this.writeAttemptToTheDOM();
+            }
+            this.checkWinner();
+            this.writeGuessedWordToTheDOM();
+        }
+    };
+    addLetterToGuessedWord(indexArray, letter) {
+        indexArray.forEach((element) => {
+            this.guessedCharactersInWord[element] = letter;
         });
     }
-}
-function writeGuessedWordToTheDOM() {
-    lettersInDOM.innerHTML = '';
-    guessedcharactersInWord.forEach((letter) => {
-        console.log(letter);
-        const li = document.createElement('li');
-        li.innerText = letter;
-        lettersInDOM.append(li);
-    });
-}
-function guessLetter(e) {
-    const target = e.target;
-    if (target.className === 'key') {
-        console.log(target.id);
-        const indexes = findLetters(target.id);
-        console.log(indexes);
-        if (indexes.length !== 0) {
-            console.log('found');
-            addLetterToGuessedWord(indexes, target.id);
-            document.getElementById(target.id).classList.add('idle');
+    writeAttemptToTheDOM() {
+        this.attemptInDOM.innerHTML = String(this.attempts);
+    }
+    setWord(newWord) {
+        this.word = newWord;
+    }
+    checkWinner() {
+        console.log(`${this.word} is ${this.guessedCharactersInWord.join('')}`);
+        if (this.word === this.guessedCharactersInWord.join('')) {
+            this.lettersInDOM.classList.add('winner');
         }
-        else {
-            console.log('not found');
-            attempts -= 1;
-            writeAttemptToTheDOM();
+        else if (this.attempts === 0) {
+            this.lettersInDOM.classList.add('lost');
+            const keys = document.querySelectorAll('.key');
+            keys.forEach((key) => {
+                key.classList.add('idle');
+            });
         }
-        checkWinner();
-        writeGuessedWordToTheDOM();
+    }
+    writeGuessedWordToTheDOM() {
+        this.lettersInDOM.innerHTML = '';
+        this.guessedCharactersInWord.forEach((letter) => {
+            console.log(letter);
+            const li = document.createElement('li');
+            li.innerText = letter;
+            this.lettersInDOM.append(li);
+        });
+    }
+    writeAlphabetToTheDom() {
+        const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+        const keyboard = document.querySelector('#keyboard');
+        keyboard.addEventListener('click', this.guessLetter);
+        alphabet.forEach((element) => {
+            const divKey = document.createElement('div');
+            divKey.id = element;
+            divKey.classList.add('key');
+            divKey.innerHTML = element;
+            keyboard.append(divKey);
+        });
+    }
+    randomNumber(min, max) {
+        return Math.round(Math.random() * (max - min) + min);
     }
 }
-function writeAlphabetToTheDom() {
-    const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
-    const keyboard = document.querySelector('#keyboard');
-    keyboard.addEventListener('click', guessLetter);
-    alphabet.forEach((element) => {
-        const divKey = document.createElement('div');
-        divKey.id = element;
-        divKey.classList.add('key');
-        divKey.innerHTML = element;
-        keyboard.append(divKey);
-    });
-}
-function randomNumber(min, max) {
-    return Math.round(Math.random() * (max - min) + min);
-}
-function init() {
-    writeAlphabetToTheDom();
-    setWord(randomWords[randomNumber(0, randomWords.length)]);
-    console.log(word);
-    splitWordInCharacters();
-    console.log(word);
-    console.log(guessedcharactersInWord);
-    writeAttemptToTheDOM();
-    writeGuessedWordToTheDOM();
-}
+const init = () => new Hangman();
 window.addEventListener('load', init);
 //# sourceMappingURL=app.js.map
